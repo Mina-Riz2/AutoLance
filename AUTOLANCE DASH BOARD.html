@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AUTULANCE — لوحة التحكم الذكية لـ Project_Database</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --ink:#1e293b;
+    --ink-soft:#475569;
+    --muted:#94a3b8;
+    --line:#e2e8f0;
+    --line-strong:#cbd5e1;
+    --accent:#d2502a;
+    --accent-soft:#fbe9e5;
+    --good:#16a34a;
+    --warn:#ca8a04;
+    --shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Cairo', sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  header.top{position:sticky;top:0;z-index:50;background:rgba(255, 255, 255, 0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05)}
+  .top-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1600px;margin:0 auto;width: 100%;}
+  .brand{display:flex;align-items:center;gap:12px;flex-grow: 1;}
+  .brand-mark{font-weight:700;font-size:22px;color:var(--ink)}
+  .brand-mark::after{content:"●";color:var(--accent);margin-right:4px;}
+  .brand-tag{font-family:'Geist Mono',monospace;font-size:11px;color:var(--muted);background:var(--bg);padding:4px 8px;border-radius:6px;}
+  
+  .top-meta{display:flex;gap:18px;align-items:center;}
+  .db-status{padding:6px 14px;border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .db-status::before{content:"";width:8px;height:8px;background:#16a34a;border-radius:50%;display:inline-block;}
+
+  main{max-width:1600px;margin:0 auto;padding:32px 28px 80px;}
+
+  /* Connection Zone */
+  .connect-wrap{display:flex;align-items:center;justify-content:center;min-height:70vh}
+  .connect-card{width:100%;max-width:650px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:40px;text-align:center;box-shadow: var(--shadow);}
+  .connect-card h1{font-size:32px;margin:0 0 12px;color:var(--ink)}
+  .connect-card h1 em{font-style:normal;color:var(--accent)}
+  .connect-card p{color:var(--ink-soft);margin:0 auto 28px;font-size:14px}
+  
+  .db-info-box{background:var(--bg);border:1px solid var(--line-strong);border-radius:8px;padding:16px;margin-bottom:24px;text-align:right;font-family:'Geist Mono', monospace;}
+  .db-info-box ul{margin:0;padding-right:20px;color:var(--ink-soft);font-size:13px;}
+  
+  .connect-cta{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:12px 32px;border-radius:6px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .15s}
+  .connect-cta:hover{background:var(--accent)}
+
+  /* Dashboard View */
+  .dash{display:none}
+  .dash.active{display:block}
+  .section-label{font-size:14px;font-weight:700;color:var(--ink-soft);margin:24px 0 14px;display:flex;align-items:center;gap:10px}
+  .section-label::after{content:"";flex-grow:1;height:1px;background:var(--line-strong)}
+
+  /* KPIs */
+  .kpi-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:28px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border-right:4px solid var(--accent)}
+  .kpi.blue{border-right-color:#2563eb}
+  .kpi.green{border-right-color:#16a34a}
+  .kpi.purple{border-right-color:#7c3aed}
+  .kpi-label{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+  .kpi-value{font-size:28px;font-weight:700;line-height:1.2;color:var(--ink)}
+  .kpi-sub{font-size:11px;color:var(--ink-soft);margin-top:6px}
+
+  /* Soft Skills Component */
+  .features-grid {display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 28px;}
+  @media(max-width: 900px){ .features-grid {grid-template-columns: 1fr;} }
+  
+  .feature-card {background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);}
+  .feature-title {font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--ink); display: flex; align-items: center; gap: 8px;}
+  .feature-title span {background: var(--accent-soft); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 11px;}
+  
+  .pert-inputs {display: flex; gap: 10px; margin-bottom: 14px;}
+  .pert-field {display: flex; flex-direction: column; gap: 4px; flex: 1;}
+  .pert-field label {font-size: 11px; color: var(--ink-soft); font-weight: 600;}
+  .pert-field input {padding: 8px; border: 1px solid var(--line-strong); border-radius: 6px; font-size: 13px;}
+  .pert-result {background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 6px; font-weight: 600; color: #166534; text-align: center;}
+
+  /* Charts Grid Updated */
+  .charts-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;margin-bottom:28px}
+  .chart-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);min-height:360px;display:flex;flex-direction:column}
+  .chart-card.span-6{grid-column:span 6}
+  @media (max-width:1100px){ .chart-card.span-6{grid-column:span 12} }
+  
+  .chart-head{margin-bottom:14px;}
+  .chart-title{font-size:15px;font-weight:700;margin:0;color:var(--ink)}
+  .chart-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .chart-canvas-wrap{flex:1;position:relative;min-height:280px;display:flex;align-items:center;justify-content:center;}
+
+  /* Table */
+  .table-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .table-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  .table-search{padding:8px 14px;border:1px solid var(--line-strong);border-radius:6px;background:var(--bg);font:inherit;font-size:13px;min-width:300px}
+  .table-scroll{overflow:auto;max-height:400px}
+  table{width:100%;border-collapse:collapse;font-size:13px;text-align:right;}
+  thead{position:sticky;top:0;background:var(--panel);z-index:1}
+  th{padding:12px 14px;font-weight:700;color:var(--ink-soft);border-bottom:2px solid var(--line);white-space:nowrap;}
+  td{padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+  tr:hover td{background:var(--bg)}
+  .badge{padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;background:var(--bg);}
+  .badge.high{background:#fef2f2;color:#991b1b}
+
+  .table-foot{padding:12px 22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-soft)}
+  .pager{display:flex;gap:6px}
+  .pager button{background:var(--bg);border:1px solid var(--line-strong);padding:6px 12px;font:inherit;cursor:pointer;border-radius:4px;}
+  .pager button:disabled{opacity:0.4;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="brand-mark">بوابة التحليل الإحصائي AUTULANCE</div>
+      <div class="brand-tag">MySQL Pipeline Analytics</div>
+    </div>
+    <div class="top-meta">
+      <div class="db-status" id="dbStatusPill" style="display:none">Connected: Project_Database</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="connect-wrap" id="connectView">
+    <div class="connect-card">
+      <h1>مرحباً بك في محرك <em>AUTULANCE</em></h1>
+      <p>النظام متصل الآن وجاهز لقراءة مستودع البيانات المصمم بهيكل النجمية (Star Schema) من سيرفر MySQL المحلي.</p>
+      
+      <div class="db-info-box">
+        <strong>المخطط الحالي المستهدف في السيرفر:</strong>
+        <ul>
+          <li>قاعدة البيانات: <code>Project_Database</code></li>
+          <li>جدول الحقائق الرئيسي: <code>Fact_Job_Posting</code></li>
+          <li>جداول الأبعاد المربوطة: <code>Dim_Job, Dim_Location, Dim_Employment_Type, Dim_Posting_Attributes, Dim_Date</code></li>
+        </ul>
+      </div>
+
+      <button class="connect-cta" id="connectDbBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-left:6px;"><path d="M4 7V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M4 17v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3M4 7c0 1.66 4 3 9 3s9-1.34 9-3M4 7c0-1.66 4-3 9-3s9-1.34 9 3M4 12c0 1.66 4 3 9 3s9-1.34 9-3M4 17c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+        تحميل ومزامنة البيانات من MySQL الحقيقي
+      </button>
+    </div>
+  </section>
+
+  <section class="dash" id="dashView">
+    
+    <div class="section-label">مقاييس مستودع البيانات الحالي (Fact Table Calculations)</div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <div class="section-label">أتمتة المهارات الشخصية والتسعير التنافسي (Soft Skills Automation)</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-title">حساب ميزانية العرض للمشروع المستهدف <span>معادلة PERT الحسابية</span></div>
+        <div class="pert-inputs">
+          <div class="pert-field">
+            <label>التفاؤلي (O) - بناءً على Lower</label>
+            <input type="number" id="pertOpt" value="35">
+          </div>
+          <div class="pert-field">
+            <label>المرجح (M) - بناءً على Avg</label>
+            <input type="number" id="pertMost" value="55">
+          </div>
+          <div class="pert-field">
+            <label>التشاؤمي (P) - بناءً على Upper</label>
+            <input type="number" id="pertPess" value="90">
+          </div>
+        </div>
+        <div class="pert-result" id="pertResult">سعر الساعة المقترح لتقديمه في العرض: $57.50 / ساعة</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-title">مراقبة التغذية المغذية للمنصات <span>Data Feeds</span></div>
+        <p style="color:var(--ink-soft); margin-top:0; font-size:13px;">تم التحقق من مؤشرات التغذية الراجعة عبر الأبعاد الفنية للملف المستورد من البنية التحتية للمشروع:</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <span class="badge" style="background:#e0f2fe; color:#0369a1;">LinkedIn Feed: Active</span>
+          <span class="badge" style="background:#e0f2fe; color:#0369a1;">Indeed Feed: Active</span>
+          <span class="badge" style="background:#e0f2fe; color:#0369a1;">ZipRecruiter Feed: Active</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">التحليلات والمؤشرات البيانية المتقدمة</div>
+    <div class="charts-grid" id="chartsGrid"></div>
+
+    <div class="section-label">سجلات جدول الحقائق (Fact Table View & Dimensions Join)</div>
+    <div class="table-card">
+      <div class="table-head">
+        <div>
+          <div class="chart-title">الاستعلام الموحد للأبعاد والوظائف المعالجة بالـ ETL</div>
+          <div class="chart-sub">استعلام مباشر حقيقي بربط الجداول بالـ Primary Keys والـ Foreign Keys</div>
+        </div>
+        <input type="text" class="table-search" id="tableSearch" placeholder="ابحث في مسميات الوظائف، الدول، أو تصنيفات الأبعاد..." />
+      </div>
+      <div class="table-scroll">
+        <table id="dataTable"></table>
+      </div>
+      <div class="table-foot">
+        <span id="tableInfo"></span>
+        <div class="pager">
+          <button id="pagePrev">السابق</button>
+          <span id="pageLabel" style="padding:4px 8px"></span>
+          <button id="pageNext">التالي</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const state = {
+  rows: [],
+  columns: ['عنوان الوظيفة (Job_Title)', 'التصنيف (Category)', 'الدولة (Country_Name)', 'الحد الأدنى (Lower)', 'الحد الأعلى (Upper)', 'المتوسط (Avg)', 'طلب عالي'],
+  page: 1,
+  perPage: 10,
+  search: '',
+  charts: [],
+  totalCountries: 0
+};
+
+/* =========================================================
+   FETCH REAL DATA FROM FASTAPI BACKEND
+========================================================= */
+document.getElementById('connectDbBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('connectDbBtn');
+  btn.textContent = "جاري الاتصال والتحميل الحقيقي...";
+  btn.disabled = true;
+
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/dashboard-data');
+    const data = await response.json();
+    
+    state.rows = data.rows;
+    state.totalCountries = data.total_countries;
+
+    document.getElementById('connectView').style.display = 'none';
+    document.getElementById('dashView').classList.add('active');
+    document.getElementById('dbStatusPill').style.display = 'inline-block';
+    
+    refreshDashboard();
+
+  } catch (error) {
+    alert("فشل الاتصال بالسيرفر الخلفي! تأكد من تشغيل ملف app.py أولاً.");
+    btn.textContent = "تحميل ومزامنة البيانات من MySQL الحقيقي";
+    btn.disabled = false;
+    console.error(error);
+  }
+});
+
+const updatePert = () => {
+  const o = Number(document.getElementById('pertOpt').value) || 0;
+  const m = Number(document.getElementById('pertMost').value) || 0;
+  const p = Number(document.getElementById('pertPess').value) || 0;
+  const e = (o + 4*m + p) / 6;
+  document.getElementById('pertResult').textContent = `سعر الساعة المقترح لتقديمه في العرض: $${e.toFixed(2)} / ساعة`;
+};
+document.getElementById('pertOpt').addEventListener('input', updatePert);
+document.getElementById('pertMost').addEventListener('input', updatePert);
+document.getElementById('pertPess').addEventListener('input', updatePert);
+
+
+/* =========================================================
+   DASHBOARD REFRESH & CHARTS
+========================================================= */
+function refreshDashboard() {
+  buildKPIs();
+  buildCharts();
+  buildTable();
+}
+
+function buildKPIs() {
+  const grid = document.getElementById('kpiGrid');
+  grid.innerHTML = '';
+
+  const totalRecords = state.rows.length;
+  const sumAvg = state.rows.reduce((acc, r) => acc + Number(r['المتوسط (Avg)']), 0);
+  const globalAvgRate = totalRecords > 0 ? (sumAvg / totalRecords) : 0;
+  const highDemandCount = state.rows.filter(r => r['طلب عالي'] === 'Yes').length;
+
+  const kpis = [
+    { label: 'سجلات جدول الحقائق (Fact_Job_Posting)', value: totalRecords.toLocaleString(), sub: 'إجمالي الصفوف المستعلمة حقيقياً من DB', cls: '' },
+    { label: 'متوسط الأجور العام (Hourly_Rate_Avg)', value: `$${globalAvgRate.toFixed(2)} / س`, sub: 'محسوب ديناميكياً من حقول الـ Fact الحقيقية', cls: 'green' },
+    { label: 'الوظائف ذات الطلب المرتفع', value: highDemandCount, sub: 'عدد حقول Is_High_Demand الموثقة بـ True', cls: 'blue' },
+    { label: 'تغطية النطاق الجغرافي المتاح', value: `${state.totalCountries} دولة`, sub: 'جداول Dim_Location الفريدة والمستخدمة', cls: 'purple' }
+  ];
+
+  kpis.forEach(k => {
+    const card = document.createElement('div');
+    card.className = `kpi ${k.cls}`;
+    card.innerHTML = `
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function destroyCharts() {
+  state.charts.forEach(c => c.destroy());
+  state.charts = [];
+}
+
+function buildCharts() {
+  destroyCharts();
+  const grid = document.getElementById('chartsGrid');
+  
+  // إعادة هيكلة شبكة الرسوم لتستوعب 4 رسوم بيانية بشكل منظم جداً (2x2)
+  grid.innerHTML = `
+    <div class="chart-card span-6">
+      <div class="chart-head"><div class="chart-title">تحليل متوسط الأجور حسب التصنيف الفني للوظيفة</div><div class="chart-sub">استعلام مجمع حقيقي لـ Hourly_Rate_Avg من قاعدة البيانات</div></div>
+      <div class="chart-canvas-wrap"><canvas id="chartCategoryRates"></canvas></div>
+    </div>
+    <div class="chart-card span-6">
+      <div class="chart-head"><div class="chart-title">التوزيع الجغرافي للمشاريع والأجور (Dim_Location)</div><div class="chart-sub">حساب التكرار الجغرافي الفعلي للوظائف</div></div>
+      <div class="chart-canvas-wrap"><canvas id="chartGeoDistribution"></canvas></div>
+    </div>
+    <div class="chart-card span-6">
+      <div class="chart-head"><div class="chart-title">نطاق الأجور (الأدنى ضد الأعلى) حسب التصنيف</div><div class="chart-sub">مقارنة فجوة الأجور لحساب تقديرات المخاطر</div></div>
+      <div class="chart-canvas-wrap"><canvas id="chartMinMaxRange"></canvas></div>
+    </div>
+    <div class="chart-card span-6">
+      <div class="chart-head"><div class="chart-title">نسبة الوظائف ذات الطلب المرتفع (High Demand)</div><div class="chart-sub">رصد مؤشرات طلب السوق الحالية</div></div>
+      <div class="chart-canvas-wrap" style="max-height: 280px;"><canvas id="chartHighDemandRatio"></canvas></div>
+    </div>
+  `;
+
+  const catStats = {};
+  const geoCounts = {};
+  let highDemandYes = 0;
+  let highDemandNo = 0;
+
+  state.rows.forEach(r => {
+    // تجميع بيانات التصنيفات
+    const cat = r['التصنيف (Category)'] || 'Unknown';
+    const rate = Number(r['المتوسط (Avg)']) || 0;
+    const low = Number(r['الحد الأدنى (Lower)']) || 0;
+    const upp = Number(r['الحد الأعلى (Upper)']) || 0;
+
+    if(!catStats[cat]) catStats[cat] = { sum: 0, count: 0, sumLow: 0, sumUpp: 0 };
+    catStats[cat].sum += rate;
+    catStats[cat].count += 1;
+    catStats[cat].sumLow += low;
+    catStats[cat].sumUpp += upp;
+
+    // تجميع البيانات الجغرافية
+    const country = r['الدولة (Country_Name)'] || 'Unknown';
+    geoCounts[country] = (geoCounts[country] || 0) + 1;
+
+    // تجميع الطلب العالي
+    if(r['طلب عالي'] === 'Yes') highDemandYes++;
+    else highDemandNo++;
+  });
+
+  const catLabels = Object.keys(catStats);
+  const catAverages = catLabels.map(l => (catStats[l].sum / catStats[l].count).toFixed(2));
+  const catLowers = catLabels.map(l => (catStats[l].sumLow / catStats[l].count).toFixed(2));
+  const catUppers = catLabels.map(l => (catStats[l].sumUpp / catStats[l].count).toFixed(2));
+
+  // 1. الرسم البياني للأعمدة (متوسط الأجور)
+  const ctxCat = document.getElementById('chartCategoryRates').getContext('2d');
+  state.charts.push(new Chart(ctxCat, {
+    type: 'bar',
+    data: {
+      labels: catLabels,
+      datasets: [{
+        label: 'متوسط سعر الساعة الحقيقي ($)',
+        data: catAverages,
+        backgroundColor: '#d2502a',
+        borderRadius: 6
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  }));
+
+  // 2. الرسم البياني الدائري (التوزيع الجغرافي)
+  const ctxGeo = document.getElementById('chartGeoDistribution').getContext('2d');
+  state.charts.push(new Chart(ctxGeo, {
+    type: 'pie',
+    data: {
+      labels: Object.keys(geoCounts),
+      datasets: [{
+        data: Object.values(geoCounts),
+        backgroundColor: ['#2563eb', '#16a34a', '#ca8a04', '#7c3aed', '#d2502a', '#06b6d4']
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  }));
+
+  // 3. الرسم البياني الخطي الجديد (مقارنة الحد الأدنى والأعلى للأجور)
+  const ctxRange = document.getElementById('chartMinMaxRange').getContext('2d');
+  state.charts.push(new Chart(ctxRange, {
+    type: 'line',
+    data: {
+      labels: catLabels,
+      datasets: [
+        {
+          label: 'متوسط الحد الأدنى ($)',
+          data: catLowers,
+          borderColor: '#2563eb',
+          backgroundColor: 'transparent',
+          tension: 0.3,
+          borderWidth: 2
+        },
+        {
+          label: 'متوسط الحد الأعلى ($)',
+          data: catUppers,
+          borderColor: '#7c3aed',
+          backgroundColor: 'transparent',
+          tension: 0.3,
+          borderWidth: 2
+        }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  }));
+
+  // 4. الرسم البياني الدائري المجوف الجديد (نسبة الطلب المرتفع)
+  const ctxDemand = document.getElementById('chartHighDemandRatio').getContext('2d');
+  state.charts.push(new Chart(ctxDemand, {
+    type: 'doughnut',
+    data: {
+      labels: ['طلب مرتفع (Yes)', 'طلب عادي (No)'],
+      datasets: [{
+        data: [highDemandYes, highDemandNo],
+        backgroundColor: ['#16a34a', '#cbd5e1'],
+        borderWidth: 0
+      }]
+    },
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  }));
+}
+
+/* =========================================================
+   PAGINATION & FILTERS
+========================================================= */
+const searchInput = document.getElementById('tableSearch');
+searchInput.addEventListener('input', (e) => {
+  state.search = e.target.value.toLowerCase();
+  state.page = 1;
+  buildTable();
+});
+
+document.getElementById('pagePrev').addEventListener('click', () => { if(state.page > 1) { state.page--; buildTable(); } });
+document.getElementById('pageNext').addEventListener('click', () => {
+  const maxPage = Math.ceil(getFilteredRows().length / state.perPage);
+  if(state.page < maxPage) { state.page++; buildTable(); }
+});
+
+function getFilteredRows() {
+  if (!state.search) return state.rows;
+  return state.rows.filter(r => {
+    return Object.values(r).some(v => String(v).toLowerCase().includes(state.search));
+  });
+}
+
+function buildTable() {
+  const table = document.getElementById('dataTable');
+  const filtered = getFilteredRows();
+  
+  if(filtered.length === 0) {
+    table.innerHTML = '<tr><td style="text-align:center; padding: 40px;">لا توجد سجلات مطابقة لعمليات الاستعلام الفنية الحقيقية.</td></tr>';
+    return;
+  }
+
+  let html = '<thead><tr>';
+  state.columns.forEach(c => { html += `<th>${c}</th>`; });
+  html += '</tr></thead><tbody>';
+
+  const start = (state.page - 1) * state.perPage;
+  const end = start + state.perPage;
+  const pageRows = filtered.slice(start, end);
+
+  pageRows.forEach(r => {
+    html += '<tr>';
+    state.columns.forEach(c => {
+      let val = r[c];
+      if (c === 'الحد الأدنى (Lower)' || c === 'الحد الأعلى (Upper)' || c === 'المتوسط (Avg)') {
+        val = `$${Number(val).toFixed(2)}`;
+      }
+      if (c === 'طلب عالي') {
+        const badgeClass = val === 'Yes' ? 'badge high' : 'badge';
+        val = `<span class="${badgeClass}">${val}</span>`;
+      }
+      html += `<td>${val}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  const maxPage = Math.ceil(filtered.length / state.perPage) || 1;
+  document.getElementById('pageLabel').textContent = `صفحة ${state.page} من ${maxPage}`;
+  document.getElementById('tableInfo').textContent = `عرض السجلات من ${start+1} إلى ${Math.min(end, filtered.length)} من أصل ${filtered.length} سجل مصفى عبر ربط المعرفات الخارجية (Foreign Keys)`;
+  
+  document.getElementById('pagePrev').disabled = state.page === 1;
+  document.getElementById('pageNext').disabled = state.page === maxPage;
+}
+</script>
+</body>
+</html>

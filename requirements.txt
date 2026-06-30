@@ -1,0 +1,8 @@
+fastapi
+mysql-connector-python
+streamlit
+pandas
+numpy
+scipy
+scikit-learn
+sqlalchemy
