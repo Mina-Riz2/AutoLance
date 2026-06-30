@@ -62,7 +62,7 @@ password = "YOUR_DATABASE_PASSWORD"  # Replace with your local MySQL password
 ---
 
 
-🚀 Getting Started & Setup
+## 🚀 Getting Started & Setup
 1. Install Prerequisites
 Ensure Python 3.8+ is installed on your machine, then run:
 
