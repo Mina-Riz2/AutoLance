@@ -1,4 +1,4 @@
-<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/4ff4570d-0a3a-4317-b87e-b416ed80b6f4" /># AutoLance
+# AutoLance
 # 🚀 AutoLance — Freelance Intelligence & Hourly Rate Predictor
 
 **AutoLance** is an end-to-end Data Engineering and Machine Learning project developed as part of the **DEPI Graduation Project**. It aims to analyze the freelancing job market, predict hourly rates for contractors using NLP and Regression models, and provide an interactive Business Intelligence dashboard for real-time decision-making.
