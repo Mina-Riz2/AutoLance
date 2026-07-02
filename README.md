@@ -44,7 +44,7 @@
 
 Due to GitHub's file size limits (the raw dataset is ~170 MB), the primary dataset (`Big_Data_Balanced.csv`) is hosted externally.
 
-- 🔗 **[Download Big_Data_Balanced.csv Here]()**
+- 🔗 **[Download Big_Data_Balanced.csv Here](https://drive.google.com/file/d/1Ri3ChZY4Qs3E58-mghczkVJSsCssp1vt/view?usp=drive_link)**
 
 > **Note:** To run the project from scratch, download the CSV file, ingest it into a local MySQL instance named `Project_Database`, and structure it according to the project's Star Schema design.
 
