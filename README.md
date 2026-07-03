@@ -84,7 +84,7 @@ Once the backend API is running, simply double-click and open AUTOLANCE DASH BOA
 
 4. Launch the AI Prediction Interface (Streamlit)
 Open a new terminal window and run:
-
+ 
 ```Bash
 streamlit run app2.py
 ```
