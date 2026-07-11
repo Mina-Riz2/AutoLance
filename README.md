@@ -90,4 +90,5 @@ streamlit run app2.py
 ```
 This will open the web interface where users can input job titles and descriptions to get real-time hourly rate predictions.
 
-Developed with ❤️ by the AutoLance Team for DEPI.
+Developed with ❤️
+ by the AutoLance Team for DEPI 
